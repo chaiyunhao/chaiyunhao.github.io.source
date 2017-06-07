@@ -276,10 +276,79 @@ MySQL、MariaDB:
 |ABS()                       |返回一个数的绝对值     |
 |COS()                       |返回一个角度的余弦        |
 |EXP()                       |返回一个数的指数值      |
-|PI()                        |去掉圆周率      |
+|PI()                        |返回圆周率      |
 |SIN()                       |返回一个角度的正弦      |
 |SQRT()                      |返回一个数的平方根      |
 |TAN()                       |返回一个角度的正切      |
+ 
+
+#### 聚集函数
+
+实际生活中我们可能需要需要汇总数据，比如我需要确定表中的行数；表中某一列的和、最大值、最小值或者平均值。这样我们需要通过聚集函数来得到我们需要的结果。
+
+|函数                         |说明	  |
+|----------------------------|:-------|
+|AVG()                       |返回某列的平均值     |
+|COUNT()                       |返回表中记录的行数        |
+|MAX()                       |返回某列的最大值      |
+|MIN()                        |返回某列的最小值      |
+|SUM()                       |返回某列的和      | 
+
+1. AVG()函数对表中的列计数后求和，根据总和和列数求的该列的平均值。   
+	计算一个所有学生的数学分数的平均值：
+	
+	    SELECT AVG(math_score) AS avg_math FROM students; 
+	    
+	也可以通过WHERE子句的约束，计算某个班级的数学平均分：  
+	    
+	    SELECT AVG(math_score) AS avg_math FROM students WHERE class_id=1;  
+ 
+ 	>AVG()函数忽略值为NULL的列！  
+ 	
+2. COUNT()函数对统计表中行的数目。
+	
+	    SELECT COUNT(*) AS count FROM students;
+	    
+	我们使用COUNT(*)可以对表中的行进行统计，无论表中的列是NULL或者非NULL值；但是假如我们要统计参加数学考试的人数，缺考的学生的分数值为NULL，那么我们就需要使用下面的SQL：  
+	
+		SELECT COUNT(math_score) AS count FROM students;
+ 	>使用COUNT(column)可以对表中相应的列进行统计，并且忽略该行的NULL值。
+ 	
+3. MAX()返回指定列中的最大值。
+	计算出所有学生中的数学最高分：
+
+	 	SELECT MAX(math_score) AS count FROM students;
+	 	
+	>MAX()函数忽略值为NULL的列。
+	>对于文本列，MAX()函数返回该列排序后的最后一行。
+
+4. MIN()返回指定列中的最大值。
+	计算出所有学生中的数学最低分：
+
+	 	SELECT MIN(math_score) AS count FROM students;
+	 	
+	>MIN()函数忽略值为NULL的列。
+	>对于文本列，MAX()函数返回该列排序后的第一行。
+
+5. SUM()函数对指定列的值进行求和。  
+	计算所有学生的数学总分：
+	
+		SELECT SUM(math_score) AS avg_math FROM students; 
+	
+	>SUM()函数忽略值为NULL的列。
+
+
+6. 以上5个聚集函数都可以结合DISTINCT使用，这里使用DISTINCT同之前是相同的效果，可以去除相同的值。
+	>虽然对MIN()和MAX()使用DISTINCT并不会报错，但是并没有任何意义。  
+	>对于COUNT()函数必须使用具体的列的时候才可以使用DISTINCT，对于COUNT(*)无法使用DISTINCT。
+
+
+#### 分组数据
+
+为了对数据进行分组后进行汇总统计，比如分别计算各个班级的平均成绩，这里我们主要使用SELECT语句的两个子句：GROUP BY子句和HAVING子句。
+
+
+
  
 __未完待续。。。__
 
