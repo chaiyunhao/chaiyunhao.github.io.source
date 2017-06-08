@@ -2,7 +2,7 @@
 title: SQL学习笔记
 date: 2017-06-04 20:21:23
 tags:
-    sql
+    SQL
 ---
 
 ### 什么是数据库  
@@ -189,9 +189,9 @@ WHERE子句中的NOT用来否定其后的关键字。例如：
 
         SELECT stu_name FROM students WHERE stu_name LIKE 'li%';  
         
- >1. 这里`%`是一种通配符，表示检索出所有名字以`li`开始的学生；
- >2. 如果我们确定我们要检索值的前一部分使用`li%`，后一部分使用`%ing`，中间一部分使用`%in%`；  
- >3. `%`通配符可以表示多个字符，`_`通配符表示一个字符，DB2不支持`_`，Microsoft Access需要使用`?`而不是`_`
+ _1. 这里`%`是一种通配符，表示检索出所有名字以`li`开始的学生；_
+ _2. 如果我们确定我们要检索值的前一部分使用`li%`，后一部分使用`%ing`，中间一部分使用`%in%`；_  
+ _3. `%`通配符可以表示多个字符，`_`通配符表示一个字符，DB2不支持`_`，Microsoft Access需要使用`?`而不是`_`_
  
    __如果不是必须，那么不要使用通配符；如果必须使用，那么请将通配符检索放在所有检索条件的末尾！！！__
  
@@ -303,7 +303,7 @@ MySQL、MariaDB:
 	    
 	    SELECT AVG(math_score) AS avg_math FROM students WHERE class_id=1;  
  
- 	>AVG()函数忽略值为NULL的列！  
+ 	_AVG()函数忽略值为NULL的列！_  
  	
 2. COUNT()函数对统计表中行的数目。
 	
@@ -312,35 +312,35 @@ MySQL、MariaDB:
 	我们使用COUNT(*)可以对表中的行进行统计，无论表中的列是NULL或者非NULL值；但是假如我们要统计参加数学考试的人数，缺考的学生的分数值为NULL，那么我们就需要使用下面的SQL：  
 	
 		SELECT COUNT(math_score) AS count FROM students;
- 	>使用COUNT(column)可以对表中相应的列进行统计，并且忽略该行的NULL值。
+ 	_使用COUNT(column)可以对表中相应的列进行统计，并且忽略该行的NULL值。_
  	
 3. MAX()返回指定列中的最大值。
 	计算出所有学生中的数学最高分：
 
 	 	SELECT MAX(math_score) AS count FROM students;
 	 	
-	>MAX()函数忽略值为NULL的列。
-	>对于文本列，MAX()函数返回该列排序后的最后一行。
+	_MAX()函数忽略值为NULL的列。_
+	_对于文本列，MAX()函数返回该列排序后的最后一行。_
 
 4. MIN()返回指定列中的最大值。
 	计算出所有学生中的数学最低分：
 
 	 	SELECT MIN(math_score) AS count FROM students;
 	 	
-	>MIN()函数忽略值为NULL的列。
-	>对于文本列，MAX()函数返回该列排序后的第一行。
+	_MIN()函数忽略值为NULL的列。_
+	_对于文本列，MAX()函数返回该列排序后的第一行。_
 
 5. SUM()函数对指定列的值进行求和。  
 	计算所有学生的数学总分：
 	
 		SELECT SUM(math_score) AS avg_math FROM students; 
 	
-	>SUM()函数忽略值为NULL的列。
+	_SUM()函数忽略值为NULL的列。_
 
 
 6. 以上5个聚集函数都可以结合DISTINCT使用，这里使用DISTINCT同之前是相同的效果，可以去除相同的值。
-	>虽然对MIN()和MAX()使用DISTINCT并不会报错，但是并没有任何意义。  
-	>对于COUNT()函数必须使用具体的列的时候才可以使用DISTINCT，对于COUNT(*)无法使用DISTINCT。
+	_虽然对MIN()和MAX()使用DISTINCT并不会报错，但是并没有任何意义。_  
+	_对于COUNT()函数必须使用具体的列的时候才可以使用DISTINCT，对于COUNT(*)无法使用DISTINCT。_
 
 
 #### 分组数据
