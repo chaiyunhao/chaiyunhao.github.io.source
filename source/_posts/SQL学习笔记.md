@@ -214,7 +214,7 @@ MySQL:
 
 #### 执行算数运算
 
-    SELECT stu_name，math_score+physics_score FROM students;
+    SELECT stu_no，math_score+physics_score FROM student_score;
 
 这里我们将学生的数学成绩和物理成绩进行相加，计算两门课程的总分。    
 SQL支持基本算数操作符：
@@ -297,27 +297,27 @@ MySQL、MariaDB:
 1. AVG()函数对表中的列计数后求和，根据总和和列数求的该列的平均值。   
 	计算一个所有学生的数学分数的平均值：
 	
-	    SELECT AVG(math_score) AS avg_math FROM students; 
+	    SELECT AVG(math_score) AS avg_math FROM student_score; 
 	    
 	也可以通过WHERE子句的约束，计算某个班级的数学平均分：  
 	    
-	    SELECT AVG(math_score) AS avg_math FROM students WHERE class_id=1;  
+	    SELECT AVG(math_score) AS avg_math FROM student_score WHERE class_id=1;  
  
  	_AVG()函数忽略值为NULL的列！_  
  	
 2. COUNT()函数对统计表中行的数目。
 	
-	    SELECT COUNT(*) AS count FROM students;
+	    SELECT COUNT(*) AS count FROM student_score;
 	    
 	我们使用COUNT(*)可以对表中的行进行统计，无论表中的列是NULL或者非NULL值；但是假如我们要统计参加数学考试的人数，缺考的学生的分数值为NULL，那么我们就需要使用下面的SQL：  
 	
-		SELECT COUNT(math_score) AS count FROM students;
+		SELECT COUNT(math_score) AS count FROM student_score;
  	_使用COUNT(column)可以对表中相应的列进行统计，并且忽略该行的NULL值。_
  	
 3. MAX()返回指定列中的最大值。
 	计算出所有学生中的数学最高分：
 
-	 	SELECT MAX(math_score) AS count FROM students;
+	 	SELECT MAX(math_score) AS count FROM student_score;
 	 	
 	_MAX()函数忽略值为NULL的列。_
 	_对于文本列，MAX()函数返回该列排序后的最后一行。_
@@ -325,7 +325,7 @@ MySQL、MariaDB:
 4. MIN()返回指定列中的最大值。
 	计算出所有学生中的数学最低分：
 
-	 	SELECT MIN(math_score) AS count FROM students;
+	 	SELECT MIN(math_score) AS count FROM student_score;
 	 	
 	_MIN()函数忽略值为NULL的列。_
 	_对于文本列，MAX()函数返回该列排序后的第一行。_
@@ -333,7 +333,7 @@ MySQL、MariaDB:
 5. SUM()函数对指定列的值进行求和。  
 	计算所有学生的数学总分：
 	
-		SELECT SUM(math_score) AS avg_math FROM students; 
+		SELECT SUM(math_score) AS avg_math FROM student_score; 
 	
 	_SUM()函数忽略值为NULL的列。_
 
@@ -343,13 +343,62 @@ MySQL、MariaDB:
 	_对于COUNT()函数必须使用具体的列的时候才可以使用DISTINCT，对于COUNT(*)无法使用DISTINCT。_
 
 
-#### 分组数据
+# 分组数据
 
 为了对数据进行分组后进行汇总统计，比如分别计算各个班级的平均成绩，这里我们主要使用SELECT语句的两个子句：GROUP BY子句和HAVING子句。
 
+#### 数据的分组
+
+之前我们只能查询一张表里全部数据的，对数据进行汇总计算，如果我们要计算一部分数据的汇总结果，只能通过WHERE条件去限定，这样每次查询都只能汇总一部分，这里通过分组汇总可以一次将所有分组的汇总结果查询出来，比如说查询每个班级的数学平均成绩：
+
+	SELECT class_id, AVG(math_score) AS avg_math FROM student_score GROUP BY class_id; 
+
+_1.GROUP BY 子句中可以包含任意数目的列，通过多列我们可以对数据进行更细致的分组。_  
+_2.GROUP BY 子句中包含的列都必须是检索列或者有效的表达式，但是不能是聚集函数。_   
+_3.大多数SQL实现中不允许GROUP BY 子句中列的数据类型是长度可变的比如文本字段。_  
+_4.如果使用GROUP BY 子句那么所有SELECT子句中出现的非聚集函数计算的列都必须在GROUP BY子句中。_
+__有些DBMS有机通过配置文件的设置改变这一情况，例如MySQL的SqlMode，但是并不推荐这样做！__  
+_5.如果GROUP BY 子句中的列包含NULL值，那么NULL将作为一个分组返回。_ 
+_5.GROUP BY 子句必须出现在WHERE子句之后，ORDER BY子句之前。_   
 
 
- 
+#### 分组数据过滤
+GROUP BY子句能够对数据进行分组统计，对统计后的结果在此进行筛选时，则需要使用HAVING子句。例如筛选出平均成句高于80分的班级：
+	
+	SELECT class_id, AVG(math_score) AS avg_math FROM student_score GROUP BY class_id HAVING AVG(math_score)>80;
+	
+_HAVING和WHERE子句都是对数据进行过滤的，但是WHERE子句用在分组之前，HAVING子句用在分组之后。_
+
+HAVING子句和WHERE子句是可以同时使用的，例如，我要查询出除去1班后，剩余班级中平均成绩高于80的班级：
+
+	SELECT class_id, AVG(math_score) AS avg_math FROM student_score WHERE class_id<>1 GROUP BY class_id HAVING AVG(math_score)>80; 
+	
+
+# SQL语句中子句的顺序
+
+|子句            |说明	            |是否必须使用|
+|---------------|:-----------------|----------|
+|SELECT         |要返回的列或者表达式 |是         |
+|FROM           |检索数据的表        |仅在需要从表中查询数据时使用|
+|WHERE          |分组之前数据过滤    |否         |
+|GROUP by       |分组数据           |仅在需要分组数据时使用     |
+|HAVING         |分组之后数据过滤     |否        |
+|ORDER BY       |数据按照相应的列排序  |否	      |
+
+
+# 子查询
+
+上面我们的查询都是只使用了一张表的数据，但是大多数情况下，我们需要展示的数据可能存在于多张表中，例如我们要查询出一个学生的成绩，但是名字信息在`students`表中，而成绩信息存储在`student_score`表中，两张表中可以通过`stu_no`学号字段关联。  
+使用简单查询时，我们需要使用两条SQL先检索出这个学生对应的学号：
+
+	SELECT stu_no,stu_name FROM students WHERE stu_name = 'liming';
+	
+假设这里查询出来的`stu_no`为1，那么我们继续从第二张表检索出liming的数学成绩：
+
+	SELECT stu_no,math_score FROM student_score WHERE stu_no=1;	
+这里我们将第一个查询转变为子查询，我们通过一个SQL就能完成我们的查询工作：
+
+ 	SELECT stu_no,math_score FROM student_score WHERE stu_no = (SELECT stu_no FROM students WHERE stu_name = 'liming');
 __未完待续。。。__
 
 
