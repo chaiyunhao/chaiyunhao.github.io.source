@@ -8,13 +8,7 @@ install:
   - npm --version
   - npm install
   - npm install hexo-cli -g
-  - npm install hexo-util -g
-  - npm install gulp -g
-  - npm install gulp-uglify -g
-  - npm install gulp-rename -g
-  - npm install gulp-clean-css -g
-  - npm install gulp-imagemin -g
-  - npm install gulp-minify-css -g
+  - npm install gulp-cli -g
   - gulp -version
 
 build_script:
