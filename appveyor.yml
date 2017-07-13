@@ -14,10 +14,13 @@ install:
   - npm install gulp-minify-css
   - npm install gulp-imagemin
   - npm install gulp-minify-css
+  - gulp -version
 
 build_script:
   - hexo generate
-  - gulp build
+  - gulp uglify
+  - gulp cssmin
+  - gulp images
 
 artifacts:
   - path: public
