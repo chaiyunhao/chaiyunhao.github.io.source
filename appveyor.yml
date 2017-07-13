@@ -8,10 +8,12 @@ install:
   - npm --version
   - npm install
   - npm install hexo-cli -g
+  - npm update minimatch
+  - npm update graceful-fs
   - npm install gulp
   - npm install gulp-uglify
   - npm install gulp-rename
-  - npm install gulp-minify-css
+  - npm install gulp-clean-css
   - npm install gulp-imagemin
   - npm install gulp-minify-css
   - gulp -version
