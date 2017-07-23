@@ -6,6 +6,29 @@ tags:
     - Sql
 ---
 
+### 准备工作
+这里我对下面需要用到的表进行初始化（表创建是以MySql为例）
+
+      #学生信息表
+      CREATE TABLE students (
+        stu_no bigint(20) not null,
+        stu_name varchar(65) not null,
+        class_id int(11) not null,
+        stu_email varchar(65),
+        stu_address varchar(255),
+        birthday date,
+        primary key(stu_no)            
+        );
+
+        #学生成绩信息
+        CREATE TABLE student_score(
+          id bigint(20) not null,
+          stu_no bigint(20) not null,
+          math_score int(11),
+          physics_score int(11),
+          );
+
+# 简单介绍
 ### 什么是数据库  
 数据库是一个以某种有组织的方式存储数据集合的容器。通常我们会把我们使用的数据库软件简单的称之为数据库，这是不正确的；数据库的本质是一个容器，我们通过数据库管理软件(DBMS)创建和操纵容器。  
 
@@ -190,17 +213,17 @@ WHERE子句中的NOT用来否定其后的关键字。例如：
 
         SELECT stu_name FROM students WHERE stu_name LIKE 'li%';  
 
- _1. 这里`%`是一种通配符，表示检索出所有名字以`li`开始的学生；_
- _2. 如果我们确定我们要检索值的前一部分使用`li%`，后一部分使用`%ing`，中间一部分使用`%in%`；_  
- _3. `%`通配符可以表示多个字符，`_`通配符表示一个字符，DB2不支持`_`，Microsoft Access需要使用`?`而不是`_`_
+ 1. 这里`%`是一种通配符，表示检索出所有名字以`li`开始的学生；
+ 2. 如果我们确定我们要检索值的前一部分使用`li%`，后一部分使用`%ing`，中间一部分使用`%in%`；  
+ 3. `%`通配符可以表示多个字符，`_`通配符表示一个字符，DB2不支持`_`，Microsoft Access需要使用`?`而不是`_`  
 
-   __如果不是必须，那么不要使用通配符；如果必须使用，那么请将通配符检索放在所有检索条件的末尾！！！__
+   如果不是必须，那么不要使用通配符；如果必须使用，那么请将通配符检索放在所有检索条件的末尾！！！
 
 # 字段的计算
 
 有时候单纯的查询结果并不能满足我们的要求，我们可能需要将两个字符串字段的值进行拼接，例如：学生名字+学生的家庭地址；可能需要对数值字段进行简单的运算，例如：计算学生的总成绩。
 
-#### 拼接字段
+### 拼接字段
 
 DB2、Oracle:  
 
@@ -213,7 +236,7 @@ MySQL:
 这里DB2和Oracle中可以在两个需要展示的字段中使用`||`表示拼接，而MySQL中需要使用CONCAT函数拼接两个字段；  
 两个字段拼接完成后展示的结果中没有对应的名字，这里我们通过`AS`关键字将这一列数据赋予别名`stus`，方便我们使用，这里`AS`关键字是可选的，我们也可以直接在拼接列的后面加空格后使用别名，也是可以的，但是推荐使用`AS`关键字。
 
-#### 执行算数运算
+### 执行算数运算
 
     SELECT stu_no，math_score+physics_score FROM student_score;
 
@@ -231,7 +254,7 @@ SQL支持基本算数操作符：
 # 函数
 虽然所有的DBMS都支持函数，但是每个DBMS都有特定的函数，这同基本的SQL语句是不同的！
 
-#### 文本处理函数
+### 文本处理函数
 
 |函数                          |说明	  |
 |-----------------------------|:-------|
@@ -244,7 +267,7 @@ SQL支持基本算数操作符：
 |UPPER() （ACCESS使用UCASE()） |将字符串转换为大写      |
 |TRIM()                       |去掉字符串两边的空格      |
 
-#### 日期和时间处理函数
+### 日期和时间处理函数
 
 每种DBMS对日期和时间的处理都有其特殊的形式，便于快速有效的排序和过滤，以及节省存储空间。这导致的每种DBMS的对于时间处理都是有差异的，针对同样的条件不同的DBMS我们需要写不同的函数来筛选。
 
@@ -270,7 +293,7 @@ MySQL、MariaDB:
 	SELECT stu_name FROM students WHERE YEAR(birthday) = 1992;
 
 
-#### 数值处理函数
+### 数值处理函数
 
 |函数                         |说明	  |
 |----------------------------|:-------|
@@ -283,7 +306,7 @@ MySQL、MariaDB:
 |TAN()                       |返回一个角度的正切      |
 
 
-#### 聚集函数
+### 聚集函数
 
 实际生活中我们可能需要需要汇总数据，比如我需要确定表中的行数；表中某一列的和、最大值、最小值或者平均值。这样我们需要通过聚集函数来得到我们需要的结果。
 
@@ -334,10 +357,9 @@ MySQL、MariaDB:
 5. SUM()函数对指定列的值进行求和。  
 	计算所有学生的数学总分：
 
-		SELECT SUM(math_score) AS avg_math FROM student_score;
+		 SELECT SUM(math_score) AS avg_math FROM student_score;
 
-	_SUM()函数忽略值为NULL的列。_
-
+	  _SUM()函数忽略值为NULL的列。_
 
 6. 以上5个聚集函数都可以结合DISTINCT使用，这里使用DISTINCT同之前是相同的效果，可以去除相同的值。
 	_虽然对MIN()和MAX()使用DISTINCT并不会报错，但是并没有任何意义。_  
@@ -348,7 +370,7 @@ MySQL、MariaDB:
 
 为了对数据进行分组后进行汇总统计，比如分别计算各个班级的平均成绩，这里我们主要使用SELECT语句的两个子句：GROUP BY子句和HAVING子句。
 
-#### 数据的分组
+### 数据的分组
 
 之前我们只能查询一张表里全部数据的，对数据进行汇总计算，如果我们要计算一部分数据的汇总结果，只能通过WHERE条件去限定，这样每次查询都只能汇总一部分，这里通过分组汇总可以一次将所有分组的汇总结果查询出来，比如说查询每个班级的数学平均成绩：
 
@@ -357,13 +379,11 @@ MySQL、MariaDB:
 _1.GROUP BY 子句中可以包含任意数目的列，通过多列我们可以对数据进行更细致的分组。_  
 _2.GROUP BY 子句中包含的列都必须是检索列或者有效的表达式，但是不能是聚集函数。_   
 _3.大多数SQL实现中不允许GROUP BY 子句中列的数据类型是长度可变的比如文本字段。_  
-_4.如果使用GROUP BY 子句那么所有SELECT子句中出现的非聚集函数计算的列都必须在GROUP BY子句中。_
-__有些DBMS有机通过配置文件的设置改变这一情况，例如MySQL的SqlMode，但是并不推荐这样做！__  
+_4.如果使用GROUP BY 子句那么所有SELECT子句中出现的非聚集函数计算的列都必须在GROUP BY子句中。_ __有些DBMS可以通过配置文件的设置改变这一情况，例如MySQL的SqlMode，但是并不推荐这样做！__  
 _5.如果GROUP BY 子句中的列包含NULL值，那么NULL将作为一个分组返回。_
 _5.GROUP BY 子句必须出现在WHERE子句之后，ORDER BY子句之前。_   
 
-
-#### 分组数据过滤
+### 分组数据过滤
 GROUP BY子句能够对数据进行分组统计，对统计后的结果在此进行筛选时，则需要使用HAVING子句。例如筛选出平均成句高于80分的班级：
 
 	SELECT class_id, AVG(math_score) AS avg_math FROM student_score GROUP BY class_id HAVING AVG(math_score)>80;
@@ -374,8 +394,7 @@ HAVING子句和WHERE子句是可以同时使用的，例如，我要查询出除
 
 	SELECT class_id, AVG(math_score) AS avg_math FROM student_score WHERE class_id<>1 GROUP BY class_id HAVING AVG(math_score)>80;
 
-
-# SQL语句中子句的顺序
+### SQL语句中子句的顺序
 
 |子句            |说明	            |是否必须使用|
 |---------------|:-----------------|----------|
@@ -386,18 +405,69 @@ HAVING子句和WHERE子句是可以同时使用的，例如，我要查询出除
 |HAVING         |分组之后数据过滤     |否        |
 |ORDER BY       |数据按照相应的列排序  |否	      |
 
-
 # 子查询
 
+### 在WHERE字句中使用子查询
 上面我们的查询都是只使用了一张表的数据，但是大多数情况下，我们需要展示的数据可能存在于多张表中，例如我们要查询出一个学生的成绩，但是名字信息在`students`表中，而成绩信息存储在`student_score`表中，两张表中可以通过`stu_no`学号字段关联。  
+
 使用简单查询时，我们需要使用两条SQL先检索出这个学生对应的学号：
 
-	SELECT stu_no,stu_name FROM students WHERE stu_name = 'liming';
+	SELECT stu_no, stu_name FROM students WHERE stu_name = 'liming';
 
 假设这里查询出来的`stu_no`为1，那么我们继续从第二张表检索出liming的数学成绩：
 
-	SELECT stu_no,math_score FROM student_score WHERE stu_no=1;
+	SELECT stu_no, math_score FROM student_score WHERE stu_no=1;
 这里我们将第一个查询转变为子查询，我们通过一个SQL就能完成我们的查询工作：
 
- 	SELECT stu_no,math_score FROM student_score WHERE stu_no = (SELECT stu_no FROM students WHERE stu_name = 'liming');
+ 	SELECT stu_no, math_score FROM student_score WHERE stu_no = (SELECT stu_no FROM students WHERE stu_name = 'liming');
+
+### 在SELECT字句中使用子查询  
+我们也可以在`SELECT`字句中使用子查询，将子查询作为结果展示。例如我们需要查询每个学生的总成绩，查询结果要求展示学生的名字。
+
+  SELECT stu_no, stu_name (SELECT math_score+physics_score FROM student_score WHERE  students.stu_no = student_score.stu_no) AS scores FROM students;
+
+# 表联结
+我们可以在查询数据库的时候使用`join`关键字对表进行关联查询，在使用这个关键字之间需要简单介绍一下什么是关系表。
+
+### 什么是关系表  
+就如刚开始的时候建立的两张表，我们建立学生成绩信息的表`student_score`的时候，不能将所有查询成绩可能用到的并且已经在学生信息表`students`中存在的字段全部建立一遍，这样会造成数据的冗余，不符合关系型数据库表结构设计的规范，所以我们通过 `stu_no`字段对两张表进行关联，那么`students`和 `student_score`就可以称之为关系表。  
+
+### 联结查询  
+上面我们将学生的基本信息存储到`students`表中，将学生的成绩信息存储在`student_score`表中，那么我们要在检索学生成绩的同时能够展示出学生的基本信息时，我们需要使用联结查询。
+
+  SELECT students.stu_name, students.class_id, students.stu_email, students.stu_address, student_score.math_score, student_score.physics_score FROM students, student_score WHERE students.stu_no = student_score.stu_no;
+
+上面的查询中，由于需要查询的字段属于不同的两张表，这里我们使用完全限定名来指定需要查询的列属于哪张表，但是我们不必这么做，因为完全限定名通常情况下会比较长，比较繁琐，我们可以使用别名的形式查询：
+  SELECT a.stu_name, a.class_id, a.stu_email, a.stu_address, b.math_score, b.physics_score FROM students AS a, student_score AS b WHERE a.stu_no = b.stu_no;
+
+这里我们需要注意我们的WHERE子句，这里我们同样使用WHERE字句来过滤我们的查询结果，对于联结查询，也就是规定两张表依照什么进行关联，如果没有WHERE字句，或者WHERE字句的过滤条件不争取，查询将会产生笛卡尔积。绝大部分情况下笛卡尔积不是我们想要的结果。
+
+### 内联结
+上面的联结查询基于两张表的某个字段值的相等，这种联结查询也称之为等值联结，也成为内联结。对于这种联结方式，我们可以采用另外一种等值的方式实现：
+  SELECT a.stu_name, a.class_id, a.stu_email, a.stu_address, b.math_score, b.physics_score FROM student_score b INNNER JOIN students a ON a.stu_no = b.stu_no;
+
+_两种查询方式的结果实际是一致的，使用哪种看个人的习惯，我习惯使用`INNER JOIN`的方式进行内联结查询。_
+_两张表可以进行关联查询，同样的对于多于两张表，我们也可以进行关联查询，唯一需要注意的就是我们进行表关联的条件是否正确，并且我们需要注意，关联的表越多，则查询效率越低。_
+
+### 自联结
+假如我们需要找到`liming`的所有同班同学，我们可以通过子查询:
+  SELECT stu_no, stu_name, class_id FROM students WHERE  class_id = (SELECT class_id FROM students WHERE stu_name = 'liming');
+
+同样我们也可以将`students`表关联两次，从而得到我们的结果：
+  SELECT a.stu_no, a.stu_name, a.class_id FROM students a INNER JOIN students b ON a.class_id = b.class_id AND b.stu_name = 'liming';
+
+这样将一张表和它自己进行联结查询的方式，称之为自联结。
+
+_通常情况下对于上面的情况，推荐使用自联结，因为DBMS处理自联结比子查询的效率要高，但是具体问题，具体分析。_
+
+### 外联结
+使用内联结查询的时候，我们只能将`students`和`student_score`表中同时存在的数据检索出来，如果某位学生转学过来，还没有参加过考试，那么`student_score`表中没有这位同学的记录，这里要想将这位同学的记录展示出来，则需要使用外联结。
+  SELECT a.stu_name, a.class_id, a.stu_email, a.stu_address, b.math_score, b.physics_score FROM student_score b RIGHT JOIN students a ON a.stu_no = b.stu_no;
+
+  SELECT a.stu_name, a.class_id, a.stu_email, a.stu_address, b.math_score, b.physics_score FROM students a LEFT JOIN student_score b ON a.stu_no = b.stu_no;
+
+上面两条sql都能达到我们的要求，这两条sql有什么区别呢，对于关联查询，我们通常将FROM字句后紧跟的表称之为主表，JOIN关键字后紧跟的表称之为子表，第一条sql，使用 `RIGHT JOIN` 表示通过关联条件子表存在但是主表不存在的结果会展示出来；第一条sql，使用 `LEFT JOIN` 表示通过关联条件主表存在但是子表不存在的结果会展示出来。
+
+_虽然在JOIN关键字的前面没有使用RIGHT或者LEFT则默认为内联结，但是通常情况下，内联结时请明确指定，使用 INNER JOIN。_
+
 __未完待续。。。__
