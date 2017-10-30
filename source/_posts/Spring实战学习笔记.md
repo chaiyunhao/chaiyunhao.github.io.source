@@ -121,10 +121,10 @@ _Spring中提供了 ServletContainerInitialize r接口的实现类 SpringServlet
 
 eg：
 
-``` 
+```
 public class DeliverFeeTemplate{
     private Long id;
-    
+
     @Min(value = 1L, message = "user.id.invalid")
     private Long shopId;
 
@@ -134,7 +134,7 @@ public class DeliverFeeTemplate{
     @Min(value = 0, message = "deliver.rule.fee.invalid")
     @Max(value = 100000000, message = "deliver.rule.fee.invalid")
     private Integer fee;
-} 
+}
 
 ```
 
@@ -145,6 +145,38 @@ public Long createTemplate(@RequestBody DeliverFeeTemplate deliverFeeTemplate) {
 ```
 
 如果请求中的deliverFeeTemplate对应的属性值不正确，则抛出相应的错误。
+
+#### Spring MVC 配置的替代方案
+如果我们不想通过扩展 AbstractAnnotationConfigDispatcherServletInitializer 来快速的搭建 Spring MVC 环境，那么我们需要自行实现 DispacthServlet 和 ContextLoaderListener
+
+1. 注册 Servlet
+eg：
+```
+public class MyServletInitializer implements WebApplicationInitializer {
+
+  @Override
+  public void onStartup(ServletContext servletContext) throws ServletException{
+    Dynamic mySerlvlet = servletContext.addServlet("Myservlet", Myservlet.class);
+    Myservlet.addMapping("/custom/**");
+  }
+
+}
+```
+
+
+2. 注册Filter
+eg：
+```
+public class MyFilterInitializer implements WebApplicationInitializer {
+
+  @Override
+  public void onStartup(ServletContext servletContext) throws ServletException{
+    Dynamic mySerlvlet = servletContext.addServlet("Myservlet", Myservlet.class);
+    Myservlet.addMapping("/custom/**");
+  }
+
+}
+```
 
 #### Web 应用异常处理
 
