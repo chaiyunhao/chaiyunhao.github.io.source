@@ -121,10 +121,10 @@ _Spring中提供了 ServletContainerInitialize r接口的实现类 SpringServlet
 
 eg：
 
-``` 
+```
 public class DeliverFeeTemplate{
     private Long id;
-    
+
     @Min(value = 1L, message = "user.id.invalid")
     private Long shopId;
 
@@ -134,7 +134,7 @@ public class DeliverFeeTemplate{
     @Min(value = 0, message = "deliver.rule.fee.invalid")
     @Max(value = 100000000, message = "deliver.rule.fee.invalid")
     private Integer fee;
-} 
+}
 
 ```
 
@@ -145,6 +145,44 @@ public Long createTemplate(@RequestBody DeliverFeeTemplate deliverFeeTemplate) {
 ```
 
 如果请求中的deliverFeeTemplate对应的属性值不正确，则抛出相应的错误。
+
+#### Spring 视图解析
+Spring自带了13个视图解析器，可以逻辑视图名转化为物理实现。
+InternalResourceViewResolver 一般用于JSP的解析。
+
+
+
+#### Spring MVC 配置的替代方案
+如果我们不想通过扩展 AbstractAnnotationConfigDispatcherServletInitializer 来快速的搭建 Spring MVC 环境，那么我们需要自行实现 DispacthServlet 和 ContextLoaderListener
+
+1. 注册 Servlet
+eg：
+```
+public class MyServletInitializer implements WebApplicationInitializer {
+
+  @Override
+  public void onStartup(ServletContext servletContext) throws ServletException{
+    javax.servlet.ServletRegistration.Dynamic mySerlvlet = servletContext.addServlet("mySerlvlet", MyServlet.class);
+    MyServlet.addMapping("/custom/**");
+  }
+
+}
+```
+
+
+2. 注册Filter
+eg：
+```
+public class MyFilterInitializer implements WebApplicationInitializer {
+
+  @Override
+  public void onStartup(ServletContext servletContext) throws ServletException{
+    javax.servlet.FilterRegistration.Dynamic myFilter = servletContext.addServlet("myFilter", MyFilter.class);
+    myFilter.addMappingForUrlPatterns(null,false,"/custom/*");
+  }
+
+}
+```
 
 #### Web 应用异常处理
 
@@ -178,3 +216,19 @@ public String handlerShopNotFoundException() {
 ##### 控制器通知
 在处理请求的类中增加异常处理方法只能处理该类中的方法抛出的异常，我们需要一个切面能够运行到整个应用的所有控制器中，Spring 3.2 中为我们提供了解决方案：控制器通知（controller advice）。
 我们可以创建一个类，添加 @ControllerAdvice 的注解，在这个类中编写包含@ExceptionHandler 注解的方法，将能被全部控制器使用。
+
+##### 保护 Web 应用
+Spring Security 是为基于Spring 的应用程序提供的声明式安全保护的安全性框架。
+
+为Spring MVC 启用Web 安全性功能的最简单配置
+
+```
+@EnableWebMvcSecurity
+public class SecurityConfig extends WebSecurityConfigureAdapter {
+
+}
+```
+WebSecurityConfigureAdapter 中包含三个方法
+1. configure(WebSecurity) 配置Spring Security 的 Filter 链
+2. configure(HttpSecurity) 配置如何通过拦截器保护请求
+3. configure(AuthenticationManagerBuilder) 配置 user-detail 服务
