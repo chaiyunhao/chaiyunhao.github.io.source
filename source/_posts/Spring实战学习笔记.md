@@ -146,12 +146,15 @@ public Long createTemplate(@RequestBody DeliverFeeTemplate deliverFeeTemplate) {
 
 如果请求中的deliverFeeTemplate对应的属性值不正确，则抛出相应的错误。
 
+<<<<<<< HEAD
 #### Spring 视图解析
 Spring自带了13个视图解析器，可以逻辑视图名转化为物理实现。
 InternalResourceViewResolver 一般用于JSP的解析。
 
 
 
+=======
+>>>>>>> b02d3b3a3e218ca2ddd3a058d0d162d9e33d148a
 #### Spring MVC 配置的替代方案
 如果我们不想通过扩展 AbstractAnnotationConfigDispatcherServletInitializer 来快速的搭建 Spring MVC 环境，那么我们需要自行实现 DispacthServlet 和 ContextLoaderListener
 
@@ -162,8 +165,13 @@ public class MyServletInitializer implements WebApplicationInitializer {
 
   @Override
   public void onStartup(ServletContext servletContext) throws ServletException{
+<<<<<<< HEAD
     javax.servlet.ServletRegistration.Dynamic mySerlvlet = servletContext.addServlet("mySerlvlet", MyServlet.class);
     MyServlet.addMapping("/custom/**");
+=======
+    Dynamic mySerlvlet = servletContext.addServlet("Myservlet", Myservlet.class);
+    Myservlet.addMapping("/custom/**");
+>>>>>>> b02d3b3a3e218ca2ddd3a058d0d162d9e33d148a
   }
 
 }
@@ -177,8 +185,13 @@ public class MyFilterInitializer implements WebApplicationInitializer {
 
   @Override
   public void onStartup(ServletContext servletContext) throws ServletException{
+<<<<<<< HEAD
     javax.servlet.FilterRegistration.Dynamic myFilter = servletContext.addServlet("myFilter", MyFilter.class);
     myFilter.addMappingForUrlPatterns(null,false,"/custom/*");
+=======
+    Dynamic mySerlvlet = servletContext.addServlet("Myservlet", Myservlet.class);
+    Myservlet.addMapping("/custom/**");
+>>>>>>> b02d3b3a3e218ca2ddd3a058d0d162d9e33d148a
   }
 
 }
