@@ -6,11 +6,6 @@ environment:
 install:
   - node --version
   - npm --version
-  - npm install npm -g
-  - npm install -g n --force
-  - n stable
-  - node --version
-  - npm --version
   - npm install
   - npm install hexo-cli -g
   - npm install gulp-cli -g
