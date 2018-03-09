@@ -4,6 +4,8 @@ environment:
     secure: aQe02aYF0Mkx3MxxYTF544L9W10/jG+lq6up9eUxRzE0NLpGzjshPXot9O6uKsNJ
 
 install:
+  - LTS --version
+  - Current --version
   - node --version
   - npm --version
   - npm install
