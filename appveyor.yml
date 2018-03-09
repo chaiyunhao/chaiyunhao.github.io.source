@@ -5,9 +5,10 @@ environment:
 
 install:
   - node --version
-  - sudo npm cache clean -f
-  - sudo npm install -g n
-  - sudo n stable
+  - npm --version
+  - npm install npm -g
+  - npm install -g n --force
+  - n stable
   - node --version
   - npm --version
   - npm install
