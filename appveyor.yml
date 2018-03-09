@@ -5,9 +5,12 @@ environment:
 
 install:
   - node --version
+  - sudo npm cache clean -f
+  - sudo npm install -g n
+  - sudo n stable
+  - node --version
   - npm --version
   - npm install
-  - npm install hexo --save
   - npm install hexo-cli -g
   - npm install gulp-cli -g
   - gulp -version
