@@ -90,7 +90,249 @@ try {
 
 ## 手动创建 Socket 使用 FTP 命令进行交互
 
-[代码链接](https://github.com/chaiyunhao/FtpSocket)
+```
+@Slf4j
+public class FtpSocket {
+
+
+    private Integer resCode;
+
+    private String resStr;
+
+    private InputStream is;
+
+    private OutputStream os;
+
+    private Socket linkSocket;
+
+    private Socket dataSocket;
+
+    private FileInputStream sendfile;
+
+    /**
+     * 建立socket连接
+     * @param addr
+     * @param port
+     * @throws IOException
+     */
+    private void connect(String addr,int port) throws IOException {
+        //"47.95.157.249"
+        linkSocket = new Socket(addr,port);
+
+        is = linkSocket.getInputStream();
+        os = linkSocket.getOutputStream();
+        //接收初始链接信息
+        byte[] buffer = new byte[100];
+        int length = is.read(buffer);
+
+        int connectCode = Integer.parseInt(new String(buffer, 0, length).substring(0, 3));
+
+        if(220 != connectCode){
+            throw new ServiceException(new String(buffer, 0, length));
+        }
+
+    }
+
+    /**
+     * FTP登陆
+     * @param user
+     * @param pass
+     * @throws IOException
+     */
+    private void ftpLogin(String user, String pass) throws IOException {
+        //发送用户名
+        sendCommond("USER "+user+"\n",is,os);
+        if (!(resCode == 331 || resCode == 230)) {
+            throw new ServiceException(resStr);
+        }
+
+        if (resCode != 230) {
+            //发送密码
+            sendCommond("PASS "+pass+"\n",is,os);
+            if (!(resCode == 230 || resCode == 202)) {
+                throw new IOException(resStr);
+            }
+        }
+    }
+
+    private void changePath(String path) throws IOException {
+        if(null != path){
+            sendCommondGB2312("CWD " + path+"\n",is,os);
+            if (resCode != 250)
+            {
+                throw new IOException(resStr);
+            }
+        }
+    }
+
+    /**
+     * 切换为被动模式
+     * @throws IOException
+     */
+    private void changeMode() throws IOException {
+        sendCommond("PASV\n",is,os);
+        if (resCode != 227) {
+            throw new IOException(resStr);
+        }
+
+        int index1 = resStr.indexOf("(");
+        int index2 = resStr.indexOf(")");
+
+        String ipData =
+                resStr.substring(index1 + 1,index2);
+        log.info(ipData);
+        String[] parts = ipData.split(",");
+
+        String ipAddress = parts[0] + "." + parts[1] + "." +
+                parts[2] + "." + parts[3];
+
+        int part4 = Integer.parseInt(parts[4]);
+        int part5 = Integer.parseInt(parts[5]);
+
+        int port = (part4 << 8) + part5;
+
+        dataSocket = new Socket(ipAddress,port);
+    }
+
+    /**
+     * 上传文件
+     * @param addr
+     * @param port
+     * @param user
+     * @param pass
+     * @param path
+     * @param uploadFileName
+     * @param fullFilePath
+     * @return
+     */
+    public Boolean upLoad(String addr,int port,String user, String pass,String path,String uploadFileName,String fullFilePath) {
+        try{
+            connect(addr,port);
+            ftpLogin(user,pass);
+
+            changePath(path);
+
+            changeMode();
+
+            sendCommondGB2312("STOR "+uploadFileName+"\n",is,os);
+            if (!(resCode == 125 || resCode == 150)) {
+                throw new IOException(resStr);
+            }
+
+            int n;
+            byte[] buff = new byte[1024];
+
+
+            sendfile = new FileInputStream(fullFilePath);
+
+            OutputStream outstr = dataSocket.getOutputStream();
+            while ((n = sendfile.read(buff)) > 0) {
+                outstr.write(buff, 0, n);
+            }
+
+            sendfile.close();
+
+            if(null != dataSocket && dataSocket.isConnected()){
+                dataSocket.close();
+            }
+
+            getFtpMsg(is);
+            log.info(""+resStr);
+            return Boolean.TRUE;
+        }catch (Exception e){
+            throw new ServiceException(e.getMessage());
+        }finally {
+            try {
+                close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
+
+    /**
+     * 关闭连接
+     * @throws IOException
+     */
+    public void close() throws IOException {
+        if(null != is){
+            is.close();
+        }
+        if(null != os){
+            os.close();
+        }
+        if(null != dataSocket){
+            dataSocket.close();
+        }
+        if(null != sendfile){
+            sendfile.close();
+        }
+        if(null != dataSocket){
+            dataSocket.close();
+        }
+
+    }
+
+    /**
+     * 文件交互完成后 通过 InputStream 获取结果
+     * @param is
+     * @throws IOException
+     */
+    private void getFtpMsg(InputStream is) throws IOException {
+        byte[] buffer = new byte[100];
+
+
+        int length = is.read(buffer);
+
+        resCode = Integer.parseInt(new String(buffer, 0, length).substring(0, 3));
+
+        resStr = new String(buffer, 0, length);
+
+    }
+
+    /**
+     * 发送命令，大部分情况下命令为英文版 不需要进行编码转换
+     * @param str
+     * @param is
+     * @param os
+     * @throws IOException
+     */
+    private void sendCommond(String str,InputStream is,OutputStream os) throws IOException {
+        byte[] buffer = new byte[100];
+
+        os.write(str.getBytes());
+
+        int length = is.read(buffer);
+
+        resCode = Integer.parseInt(new String(buffer, 0, length).substring(0, 3));
+
+        resStr = new String(buffer, 0, length);
+
+    }
+
+    /**
+     * 上传文件时，文件名存在中文，需要进行处理
+     * @param str
+     * @param is
+     * @param os
+     * @throws IOException
+     */
+    private void sendCommondGB2312(String str,InputStream is,OutputStream os) throws IOException {
+        byte[] buffer = new byte[100];
+
+        os.write(str.getBytes("gb2312"));
+
+        int length = is.read(buffer);
+
+        resCode = Integer.parseInt(new String(buffer, 0, length).substring(0, 3));
+
+        resStr = new String(buffer, 0, length);
+    }
+
+}
+```
 
 通过手动创建 Socket 的方式同 FTP交互，需要了解 FTP 的命令字和应答码
 
