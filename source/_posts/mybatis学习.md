@@ -47,16 +47,16 @@ Object Relation Mapping  对象关系映射
 | databaseIdProvider          | 数据库标识提供商          |
 | mappers          | sql映射文件          |
 
-==要注意以上属性在xml文件中存在顺序要求，dtd 文件中定义了属性的顺序==
+* 要注意以上属性在xml文件中存在顺序要求，dtd 文件中定义了属性的顺序 
 
-==MyBatis 允许你在已映射语句执行过程中的某一点进行拦截调用。默认情况下，MyBatis 允许使用插件来拦截的方法调用包括：==
-* Executor (update, query, flushStatements, commit, rollback, getTransaction, close, isClosed)
-* ParameterHandler (getParameterObject, setParameters)
-* ResultSetHandler (handleResultSets, handleOutputParameters)
-* StatementHandler (prepare, parameterize, batch, update, query)
+*  MyBatis 允许你在已映射语句执行过程中的某一点进行拦截调用。默认情况下，MyBatis 允许使用插件来拦截的方法调用包括： 
+1. Executor (update, query, flushStatements, commit, rollback, getTransaction, close, isClosed)
+2. ParameterHandler (getParameterObject, setParameters)
+3. ResultSetHandler (handleResultSets, handleOutputParameters)
+4. StatementHandler (prepare, parameterize, batch, update, query)
 
-==mappers：==
-* 使用相对于类路径的资源引用
+*  mappers：
+1. 使用相对于类路径的资源引用
 
 ```xml
 <mappers>
@@ -64,7 +64,7 @@ Object Relation Mapping  对象关系映射
 </mappers>
 ```
 
-* 使用完全限定资源定位符（URL）
+2. 使用完全限定资源定位符（URL）
 
 ```xml
 <mappers>
@@ -72,7 +72,7 @@ Object Relation Mapping  对象关系映射
 </mappers>
 ```
 
-* 使用映射器接口实现类的完全限定类名
+3. 使用映射器接口实现类的完全限定类名
 
 ```xml
 <mappers>
@@ -80,7 +80,7 @@ Object Relation Mapping  对象关系映射
 </mappers>
 ```
 
-* 将包内的映射器接口实现全部注册为映射器
+4. 将包内的映射器接口实现全部注册为映射器
 
 ```xml
 <mappers>
@@ -251,6 +251,7 @@ public interface OrderNodeInstancesMapper {
 
 #### 测试执行
 * xml
+
 ```java
 try {
             String resource = "mybatis-config.xml";
@@ -297,7 +298,7 @@ xml：增加xml文件麻烦、条件不确定、容易出错、特殊字符转�
 #### 引入maven的plugins
 
 ```xml
-<plugin>
+            <plugin>
                 <groupId>org.mybatis.generator</groupId>
                 <artifactId>mybatis-generator-maven-plugin</artifactId>
                 <version>1.3.7</version>
@@ -430,9 +431,9 @@ org.apache.ibatis.session.defaults.DefaultSqlSessionFactory.openSession()
     >org.apache.ibatis.session.Configuration.newExecutor(org.apache.ibatis.transaction.Transaction, org.apache.ibatis.session.ExecutorType)
       >org.apache.ibatis.executor.SimpleExecutor
         >org.apache.ibatis.executor.CachingExecutor  一级缓存 自动
-          >org.apache.ibatis.plugin.InterceptorChain.pluginAll 责任链模式
-```          
-          
+          >org.apache.ibatis.plugin.InterceptorChain.pluginAll 
+```
+
 ##### 拦截器
 
 如果需要可以在这里添加相应拦截器，比如日志打印sql等
